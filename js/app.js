@@ -244,8 +244,9 @@ global.initAudio = () => { // OPENDAY 2024 AND BROWSER EDITION + SOUNDTRACK
 	// console.log(global.MIC)
 	document.getElementById("loader").style.display = "none"
 	randomSketch()
+	toggleDirector()
 	const soundtrack = document.createElement('audio')
-	soundtrack.src="assets/soundtrack/soundtrack.mp3"
+	soundtrack.src = "assets/soundtrack/soundtrack.mp3"
 	soundtrack.loop = true;
 	soundtrack.play();
 }
@@ -272,15 +273,7 @@ const onKeyDown = (event) => {
 			reclickSketch()
 		} else if (keyCode == 116) {
 			event.preventDefault() // F5 - Director mode
-			if (!playingDirector) {
-				document.getElementById("directorModeStatus").style.display = "initial"
-				playingDirector = true;
-				playDirector();
-			} else {
-				document.getElementById("directorModeStatus").style.display = "none"
-				playingDirector = false;
-				clearInterval(nextCut);
-			}
+			toggleDirector()
 		}
 	}
 }
@@ -291,6 +284,17 @@ const toggleMouse = () => {
 	showCursor = !showCursor
 	if (showCursor) window.document.body.style.cursor = 'crosshair'
 	else window.document.body.style.cursor = 'none'
+}
+const toggleDirector = () => {
+	if (!playingDirector) {
+		document.getElementById("directorModeStatus").style.display = "initial"
+		playingDirector = true;
+		playDirector();
+	} else {
+		document.getElementById("directorModeStatus").style.display = "none"
+		playingDirector = false;
+		clearInterval(nextCut);
+	}
 }
 const toggleFullscreen = () => {
 	isFullscreen = false
@@ -380,9 +384,28 @@ window.addEventListener('load', init)
 /* xxx OPENDAY 2024 AND BROWSER EDITION */
 /* change to a random set and sketch */
 const randomSketch = () => {
+	/* 
+	0 grid
+	1 planets
+	2 columns
+	3 fluids/clouds
+	4 skulls
+	5 fire
+	6 end titles
+	*/
 	const sets = [0, 1, 2, 3, 4, 5, 6] // available sets
+	const setsWeighs = [0.15, 0.225, 0.15, 0.35, 0.05, 0.05, 0.025] // available sets: probability weight
 	const sketches = [11, 12, 7, 13, 3, 5, 2] // no. of available sketches for each set
-	global.playSet = Math.round(Math.random() * (sets.length - 1));
+	// playSet
+	// pure random
+	// global.playSet = Math.round(Math.random() * (sets.length - 1));
+	// weighted random
+	// let totalWeights = setsWeighs.reduce((a, b) => a + b, 0)
+	const totalWeights = 1
+	// console.log(totalWeights)
+	let r = Math.random() * totalWeights
+	global.playSet = sets.find((_, i) => (r -= setsWeighs[i]) <= 0)
+	// playSketch
 	const playSetHowManySketches = sketches[playSet] - 2;
 	global.playSketch = 1 + Math.round(Math.random() * (playSetHowManySketches));
 	// console.log(playSet, playSetHowManySketches, playSketch);
